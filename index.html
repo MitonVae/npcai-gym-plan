@@ -174,7 +174,8 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <th class="idx">#</th>
             <th>Task 名称</th>
-            <th>测试参数</th>
+            <th>Spoon节点配置</th>
+            <th>代码参数</th>
             <th>通过条件</th>
           </tr>
         </thead>
@@ -182,30 +183,35 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <td class="idx">1</td>
             <td>Follow_基础跟随</td>
+            <td>填写「跟随距离=3」「最大距离=8」</td>
             <td><span class="mono">followDis=3</span> <span class="mono">maxDis=8</span></td>
             <td class="pass-cond">NPC始终保持在 3~8m 范围内跟随移动</td>
           </tr>
           <tr>
             <td class="idx">2</td>
             <td>Follow_到达即停止</td>
+            <td>勾选「启用结束条件」</td>
             <td><span class="mono">enableEndCondition=true</span></td>
             <td class="pass-cond">NPC到达目标点后停止，不继续游荡</td>
           </tr>
           <tr>
             <td class="idx">3</td>
             <td>Follow_持续跟随不停止</td>
+            <td>取消勾选「启用结束条件」</td>
             <td><span class="mono">enableEndCondition=false</span></td>
             <td class="pass-cond">NPC持续跟随，无论玩家静止仍保持跟随状态</td>
           </tr>
           <tr>
             <td class="idx">4</td>
             <td>Follow_卡住重置</td>
+            <td>填写「卡住打断时间=3」</td>
             <td><span class="mono">stuckBreakTime=3</span></td>
             <td class="pass-cond">卡住3秒后触发重置逻辑，NPC重新找路</td>
           </tr>
           <tr>
             <td class="idx">5</td>
             <td>Follow_超距传送</td>
+            <td>填写「传送距离=20」</td>
             <td><span class="mono">teleportDis=20</span></td>
             <td class="pass-cond">距离超过20m时NPC直接传送到玩家附近</td>
           </tr>
@@ -230,7 +236,8 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <th class="idx">#</th>
             <th>Task 名称</th>
-            <th>测试参数</th>
+            <th>Spoon节点配置</th>
+            <th>代码参数</th>
             <th>通过条件</th>
           </tr>
         </thead>
@@ -238,30 +245,35 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <td class="idx">1</td>
             <td>Lead_引路模式</td>
+            <td>勾选「是否带路」</td>
             <td><span class="mono">isLeadingWay=true</span></td>
             <td class="pass-cond">NPC在玩家前方引路，玩家偏离时等待</td>
           </tr>
           <tr>
             <td class="idx">2</td>
             <td>Lead_普通路点移动</td>
+            <td>取消勾选「是否带路」</td>
             <td><span class="mono">isLeadingWay=false</span></td>
             <td class="pass-cond">NPC按路点顺序移动，不等待玩家</td>
           </tr>
           <tr>
             <td class="idx">3</td>
             <td>Lead_路点循环</td>
+            <td>勾选「是否沿路点移动」，勾选「循环」</td>
             <td><span class="mono">IsWayPointMove=true</span> <span class="mono">loop=true</span></td>
             <td class="pass-cond">NPC到达终点后循环回起点</td>
           </tr>
           <tr>
             <td class="idx">4</td>
             <td>Lead_引路等待超时</td>
+            <td>勾选「是否带路」，填写「等待超时=10」</td>
             <td><span class="mono">isLeadingWay=true</span> <span class="mono">waitTimeout=10</span></td>
             <td class="pass-cond">等待玩家超过10s后触发超时回调</td>
           </tr>
           <tr>
             <td class="idx">5</td>
             <td>Lead_指定终点停止</td>
+            <td>取消勾选「是否沿路点移动」，填写终点坐标</td>
             <td><span class="mono">IsWayPointMove=false</span> <span class="mono">endPoint</span></td>
             <td class="pass-cond">NPC移动到指定坐标后停止行为树</td>
           </tr>
@@ -286,7 +298,8 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <th class="idx">#</th>
             <th>Task 名称</th>
-            <th>测试参数</th>
+            <th>Spoon节点配置</th>
+            <th>代码参数</th>
             <th>通过条件</th>
           </tr>
         </thead>
@@ -294,24 +307,28 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <td class="idx">1</td>
             <td>Move_跑步到达</td>
+            <td>「移动方式」选择「跑步」</td>
             <td><span class="mono">moveType=Run</span></td>
             <td class="pass-cond">NPC以跑步速度到达目标点</td>
           </tr>
           <tr>
             <td class="idx">2</td>
             <td>Move_走路到达</td>
+            <td>「移动方式」选择「行走」</td>
             <td><span class="mono">moveType=Walk</span></td>
             <td class="pass-cond">NPC以行走速度到达目标点</td>
           </tr>
           <tr>
             <td class="idx">3</td>
             <td>Move_到达后播放动作</td>
+            <td>填写「到达动作=wave」</td>
             <td><span class="mono">arriveAction="wave"</span></td>
             <td class="pass-cond">NPC到达后立即播放指定动作，动作完成后退出</td>
           </tr>
           <tr>
             <td class="idx">4</td>
             <td>Move_到达精度</td>
+            <td>填写「到达判定半径=0.5」</td>
             <td><span class="mono">arriveRadius=0.5</span></td>
             <td class="pass-cond">NPC在0.5m误差内触发到达事件</td>
           </tr>
@@ -336,7 +353,8 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <th class="idx">#</th>
             <th>Task 名称</th>
-            <th>测试参数</th>
+            <th>Spoon节点配置</th>
+            <th>代码参数</th>
             <th>通过条件</th>
           </tr>
         </thead>
@@ -344,24 +362,28 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
           <tr>
             <td class="idx">1</td>
             <td>Turn_朝向玩家</td>
+            <td>「目标类型」选择「玩家」</td>
             <td><span class="mono">targetType=Player</span></td>
             <td class="pass-cond">NPC转向并面朝玩家，误差 &lt; 5°</td>
           </tr>
           <tr>
             <td class="idx">2</td>
             <td>Turn_朝向固定角度</td>
+            <td>「目标类型」选择「角度」，填写「角度=90」</td>
             <td><span class="mono">targetType=Angle</span> <span class="mono">angle=90</span></td>
             <td class="pass-cond">NPC转到世界坐标90°方向</td>
           </tr>
           <tr>
             <td class="idx">3</td>
             <td>Turn_平滑转向</td>
+            <td>勾选「平滑转向」，填写「转向速度=90」</td>
             <td><span class="mono">smooth=true</span> <span class="mono">turnSpeed=90</span></td>
             <td class="pass-cond">NPC以 90°/s 平滑旋转，无突变</td>
           </tr>
           <tr>
             <td class="idx">4</td>
             <td>Turn_瞬间转向</td>
+            <td>取消勾选「平滑转向」</td>
             <td><span class="mono">smooth=false</span></td>
             <td class="pass-cond">NPC在一帧内完成转向</td>
           </tr>
@@ -443,49 +465,51 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
       <div class="phase">
         <div class="phase-head p1">
           <div class="pn">Phase 1 · Q2 2026</div>
-          <h3>基础覆盖</h3>
-          <div class="pt">P0 节点全部接入自动化</div>
+          <h3>全节点接入</h3>
+          <div class="pt">4个核心节点全部基础接入</div>
         </div>
         <div class="phase-body">
           <ul>
-            <li class="done">StartTaskBTNpcTraceUnit2 全参数独立 Task</li>
-            <li class="done">StartBTCheckPointMove2 全参数独立 Task</li>
+            <li>StartTaskBTNpcTraceUnit2 基础 Task 接入</li>
+            <li>StartBTCheckPointMove2 基础 Task 接入</li>
+            <li>StartTaskBTNpcMove2 基础 Task 接入</li>
+            <li>NpcChangeDirection 基础 Task 接入</li>
             <li>两层验证框架搭建（Spoon + Interface）</li>
-            <li>每 Task 独立断言，失败立刻触发复核</li>
             <li>集成进 CI 日报</li>
           </ul>
-          <div class="note">目标：覆盖核心行为，能定位 Spoon vs 引擎 Bug</div>
+          <div class="note">目标：所有节点跑通，建立基线</div>
         </div>
       </div>
       <div class="phase">
         <div class="phase-head p2">
           <div class="pn">Phase 2 · Q3 2026</div>
-          <h3>参数组合 & P1 节点</h3>
-          <div class="pt">覆盖边界组合，接入 P1 节点</div>
+          <h3>参数完善</h3>
+          <div class="pt">每个节点各关键参数独立 Task 覆盖</div>
         </div>
         <div class="phase-body">
           <ul>
-            <li>StartTaskBTNpcMove2 接入</li>
-            <li>NpcChangeDirection 接入</li>
-            <li>跨节点组合场景（引路+到达+转向）</li>
-            <li>极值参数压力测试（超大距离、极短超时）</li>
-            <li>失败率统计与趋势分析</li>
+            <li>各节点重要参数拆分为独立 Task</li>
+            <li>Spoon 配置项与代码参数双重标注</li>
+            <li>跨节点组合场景（引路 + 到达 + 转向）</li>
+            <li>Interface 层复核路径完善</li>
+            <li>失败率统计与分类归因</li>
           </ul>
-          <div class="note">目标：参数矩阵覆盖率 &gt; 80%</div>
+          <div class="note">目标：参数覆盖率 &gt; 80%，能精准定位 Bug 层级</div>
         </div>
       </div>
       <div class="phase">
         <div class="phase-head p3">
           <div class="pn">Phase 3 · Q4 2026</div>
-          <h3>异常恢复 & 稳定性</h3>
-          <div class="pt">异常注入 + 长时稳定性验证</div>
+          <h3>边界测试 & 稳定性</h3>
+          <div class="pt">极值参数 + 异常场景 + 长时稳定</div>
         </div>
         <div class="phase-body">
           <ul>
-            <li>卡住/超时异常注入测试</li>
+            <li>极值参数测试（超大距离、极短超时、零值）</li>
+            <li>卡住/超时异常注入</li>
             <li>NavMesh 断裂场景复现</li>
             <li>长时间运行（30min+）稳定性</li>
-            <li>多 NPC 并发跑 GYM</li>
+            <li>多 NPC 并发场景</li>
             <li>回归测试套件沉淀</li>
           </ul>
           <div class="note">目标：线上回归 0 漏报</div>
