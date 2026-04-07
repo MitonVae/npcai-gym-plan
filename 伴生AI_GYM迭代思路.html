@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>伴生AI GYM 检查节点方案</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Microsoft YaHei', sans-serif; background: #f0f4f8; color: #333; font-size: 13px; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1e2d6b 0%, #3d52d5 70%, #5b8dee 100%);
+  color: white; padding: 32px 48px 24px;
+}
+.header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.header h1 em { color: #ffd666; font-style: normal; }
+.header p { font-size: 13px; opacity: 0.8; }
+.header-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.header-tag { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 3px 14px; font-size: 12px; }
+
+/* Layout */
+.main { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; margin-bottom: 32px; }
+.stat { background: white; border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.stat .n { font-size: 28px; font-weight: 700; color: #3d52d5; }
+.stat .l { font-size: 12px; color: #999; margin-top: 3px; }
+
+/* Section title */
+.sec-title { font-size: 17px; font-weight: 700; color: #1a1a2e; border-left: 4px solid #3d52d5; padding-left: 11px; margin-bottom: 16px; }
+.section { margin-bottom: 36px; }
+
+/* Two column layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* Layer tabs */
+.layer-block { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.layer-header { padding: 12px 18px; display: flex; align-items: center; gap: 10px; color: white; }
+.layer-header.spoon { background: linear-gradient(90deg, #1e2d6b, #3d52d5); }
+.layer-header.api { background: linear-gradient(90deg, #2e5c3e, #3aaa62); }
+.layer-header h3 { font-size: 14px; font-weight: 700; }
+.layer-header p { font-size: 11px; opacity: 0.8; margin-top: 1px; }
+.layer-badge { background: rgba(255,255,255,0.2); border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+
+/* Check table inside layer block */
+.check-table { width: 100%; border-collapse: collapse; }
+.check-table th { background: #f5f7ff; padding: 9px 12px; text-align: left; font-size: 12px; color: #555; border-bottom: 2px solid #e8ecf8; }
+.check-table td { padding: 9px 12px; border-bottom: 1px solid #f0f3fa; vertical-align: top; line-height: 1.6; }
+.check-table tbody tr:hover { background: #f9fbff; }
+.check-table tbody tr:last-child td { border-bottom: none; }
+.check-table .idx { color: #bbb; font-size: 11px; text-align: center; width: 30px; }
+.check-table .pass { color: #27ae60; font-size: 12px; }
+.check-table .how { color: #888; font-size: 12px; }
+
+/* Node tag */
+.nt { display: inline-block; background: #eef2ff; color: #3d52d5; border-radius: 3px; padding: 1px 6px; font-family: monospace; font-size: 11px; }
+.nt.green { background: #e8f8ef; color: #27ae60; }
+
+/* Badge */
+.b { display: inline-block; border-radius: 3px; padding: 1px 7px; font-size: 11px; font-weight: 600; }
+.b-spoon { background: #eef2ff; color: #3d52d5; }
+.b-api { background: #e8f8ef; color: #1a8c4e; }
+.b-p0 { background: #fde8e8; color: #c0392b; }
+.b-p1 { background: #fff3e0; color: #e67e22; }
+.b-p2 { background: #e8f4fd; color: #2980b9; }
+.b-p3 { background: #f0f0f0; color: #888; }
+.b-new { background: #e6f9f0; color: #27ae60; }
+.b-add { background: #fff3e0; color: #e67e22; }
+
+/* Flow diagram */
+.flow-wrap { background: white; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.flow-title { text-align: center; font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+.flow-sub { text-align: center; font-size: 12px; color: #999; margin-bottom: 24px; }
+.flow-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; }
+
+/* Flow boxes */
+.fb { display: inline-block; text-align: center; }
+.fb-start { background: #1e2d6b; color: white; border-radius: 6px; padding: 8px 28px; font-size: 13px; font-weight: 700; }
+.fb-spoon-zone { background: #eef2ff; border: 1.5px dashed #3d52d5; border-radius: 8px; padding: 14px 20px; margin: 6px 0; width: 260px; }
+.fb-spoon-zone .zone-label { font-size: 11px; color: #3d52d5; font-weight: 700; margin-bottom: 8px; }
+.fb-blue { background: #3d52d5; color: white; border-radius: 6px; padding: 7px 16px; font-size: 12px; width: 220px; text-align: center; margin: 3px auto; }
+.fb-blue small { display: block; font-size: 10px; opacity: 0.8; margin-top: 2px; }
+.fb-diamond-wrap { display: flex; justify-content: center; margin: 8px 0; }
+.fb-diamond { width: 90px; height: 90px; border: 2px solid #e67e22; transform: rotate(45deg); background: white; position: relative; }
+.fb-diamond-text { position: absolute; top:50%; left:50%; transform: translate(-50%,-50%) rotate(-45deg); font-size: 11px; text-align: center; color: #1a1a2e; white-space: nowrap; font-weight: 700; }
+.fb-pass { background: #27ae60; color: white; border-radius: 6px; padding: 7px 16px; font-size: 12px; text-align: center; }
+.fb-api-zone { background: #f0fdf6; border: 1.5px dashed #27ae60; border-radius: 8px; padding: 14px 20px; width: 260px; }
+.fb-api-zone .zone-label { font-size: 11px; color: #27ae60; font-weight: 700; margin-bottom: 8px; }
+.fb-green { background: #27ae60; color: white; border-radius: 6px; padding: 7px 16px; font-size: 12px; width: 220px; text-align: center; margin: 3px auto; }
+.fb-red { background: #e74c3c; color: white; border-radius: 6px; padding: 7px 16px; font-size: 12px; text-align: center; }
+.fb-gray { background: #95a5a6; color: white; border-radius: 6px; padding: 7px 22px; font-size: 12px; text-align: center; }
+.fb-end { background: #1e2d6b; color: white; border-radius: 6px; padding: 8px 28px; font-size: 13px; font-weight: 700; }
+.arrow { font-size: 18px; color: #aaa; line-height: 1; margin: 2px 0; text-align: center; }
+.arrow-row { display: flex; align-items: flex-start; justify-content: center; gap: 20px; margin: 4px 0; }
+.arrow-label { font-size: 11px; color: #555; margin-top: 2px; }
+
+/* Legend */
+.legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; padding: 12px 16px; background: #f8f9ff; border-radius: 8px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+.legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+
+/* Full check table */
+.full-table-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.full-table { width: 100%; border-collapse: collapse; }
+.full-table thead tr { background: #1e2d6b; color: white; }
+.full-table th { padding: 11px 12px; text-align: left; font-size: 12px; font-weight: 600; }
+.full-table td { padding: 9px 12px; border-bottom: 1px solid #f0f3fa; vertical-align: top; line-height: 1.6; font-size: 12px; }
+.full-table tbody tr:hover { background: #f9fbff; }
+.full-table tbody tr:last-child td { border-bottom: none; }
+.full-table tbody tr.api-row { background: #f5fdf8; }
+.full-table tbody tr.api-row:hover { background: #ecfaf2; }
+
+/* Summary */
+.summary { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #3d52d5; }
+.summary h3 { font-size: 15px; color: #1e2d6b; margin-bottom: 12px; }
+.summary li { color: #555; line-height: 2.1; margin-left: 18px; }
+
+code { font-family: monospace; font-size: 11px; background: #f0f2f8; color: #3d52d5; border-radius: 3px; padding: 1px 5px; }
+
+@media(max-width:900px){
+  .stats{grid-template-columns:repeat(3,1fr);}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🤖 伴生AI GYM <em>最小单元</em>检查节点方案</h1>
+  <p>Sheet1 = SPOON层检查项 · Sheet2 = SPOON层 + 接口层联合对照 · 两层互为兜底验证</p>
+  <div class="header-tags">
+    <div class="header-tag">SPOON层 20项</div>
+    <div class="header-tag">接口层 13项</div>
+    <div class="header-tag">覆盖9类节点</div>
+    <div class="header-tag">Spoon失败→接口层兜底验证</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="n">20</div><div class="l">SPOON层检查项</div></div>
+    <div class="stat"><div class="n">13</div><div class="l">接口层检查项</div></div>
+    <div class="stat"><div class="n">9</div><div class="l">覆盖节点类型</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">跟随/带路检查项</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">单点移动检查项</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">转向检查项</div></div>
+  </div>
+
+  <!-- 自动化执行流程 -->
+  <div class="section">
+    <div class="sec-title">自动化测试执行流程</div>
+    <div class="flow-wrap">
+      <div class="flow-title">伴生AI 自动化测试执行流程</div>
+      <div class="flow-sub">SPOON层失败 → 接口层兜底验证 · 精确区分 Spoon Bug / NPC 功能 Bug</div>
+
+      <div style="display:flex;gap:40px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
+
+        <!-- 左侧主流程 -->
+        <div class="flow-diagram" style="min-width:260px;">
+          <div class="fb"><div class="fb-start">▶ 开始自动化测试</div></div>
+          <div class="arrow">↓</div>
+
+          <div class="fb-spoon-zone">
+            <div class="zone-label">SPOON 层</div>
+            <div class="fb-blue">选取 Spoon 节点测试用例<br><small>按节点分组逐组执行</small></div>
+            <div class="arrow" style="font-size:14px;">↓</div>
+            <div class="fb-blue">执行 Spoon 层测试用例<br><small>通过 Spoon 节点触发 NPC 行为</small></div>
+          </div>
+
+          <div class="arrow">↓</div>
+          <div class="fb-diamond-wrap">
+            <div class="fb-diamond"><div class="fb-diamond-text">Spoon<br>测试通过？</div></div>
+          </div>
+
+          <div class="arrow-row">
+            <div style="text-align:center;">
+              <div class="arrow-label" style="color:#27ae60;">✓ 通过</div>
+              <div class="arrow" style="color:#27ae60;">↓</div>
+              <div class="fb-pass">记录 PASS（Spoon层）</div>
+            </div>
+            <div style="text-align:center;">
+              <div class="arrow-label" style="color:#e74c3c;">✗ 失败</div>
+              <div class="arrow" style="color:#e74c3c;">↓</div>
+              <div class="fb-api-zone">
+                <div class="zone-label">接口层（兜底）</div>
+                <div class="fb-green">查找对应 GM 接口用例<br><small>同一 Spoon 节点触发</small></div>
+                <div class="arrow" style="font-size:14px;">↓</div>
+                <div class="fb-green">执行 GM 接口测试用例<br><small>绕过 Spoon，查底层</small></div>
+                <div class="arrow" style="font-size:14px;">↓</div>
+                <div class="fb-diamond-wrap" style="margin:4px 0;">
+                  <div class="fb-diamond" style="width:74px;height:74px;border-color:#e67e22;">
+                    <div class="fb-diamond-text" style="font-size:10px;">接口层<br>通过？</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:center;margin-top:6px;">
+                  <div style="text-align:center;font-size:11px;">
+                    <div style="color:#27ae60;">✓</div>
+                    <div style="background:#e8f8ef;color:#1a8c4e;border-radius:4px;padding:3px 8px;">Spoon层问题<br>NPC功能OK</div>
+                  </div>
+                  <div style="text-align:center;font-size:11px;">
+                    <div style="color:#e74c3c;">✗</div>
+                    <div class="fb-red" style="font-size:11px;padding:3px 8px;">NPC功能Bug<br>提单跟进</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="arrow" style="margin-top:8px;">↓</div>
+          <div class="fb"><div class="fb-gray">当前节点组测试完成</div></div>
+          <div class="arrow">↓</div>
+          <div class="fb-diamond-wrap">
+            <div class="fb-diamond"><div class="fb-diamond-text">还有未测<br>Spoon节点？</div></div>
+          </div>
+          <div class="arrow" style="color:#27ae60;">↓ 无</div>
+          <div class="fb"><div class="fb-green" style="width:auto;padding:7px 24px;">全部节点测试完成 → 生成报告</div></div>
+          <div class="arrow">↓</div>
+          <div class="fb"><div class="fb-end">■ 结束</div></div>
+        </div>
+
+      </div>
+
+      <!-- 图例 -->
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#3d52d5;"></div>SPOON 层测试节点</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#27ae60;"></div>接口层（GM接口）兜底测试</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#27ae60;opacity:0.6;"></div>PASS / 问题归因：Spoon 层</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e74c3c;"></div>FAIL / NPC 功能 Bug 提单</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e67e22;transform:rotate(45deg);"></div>判断节点</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPOON层检查项 -->
+  <div class="section">
+    <div class="sec-title">SPOON 层检查项（Sheet1）</div>
+    <div class="full-table-wrap">
+      <table class="full-table">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th style="width:200px;">检查节点</th>
+            <th style="width:200px;">检查项</th>
+            <th>怎么测</th>
+            <th style="width:200px;">怎么算通过</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><span class="nt">StartTaskBTNpcTraceUnit</span></td><td>跟随AI — NPC 范围内跟随</td><td>配置启用结束条件，玩家站在最小~最大范围内，启动节点，Unit走到指定点</td><td class="pass">NPC 持续追随 Unit，节点不提前结束</td></tr>
+          <tr><td>2</td><td><span class="nt">StartTaskBTNpcTraceUnit</span></td><td>跟随AI — NPC 超出最大范围结束</td><td>配置启用结束条件，玩家传送到最大范围以外</td><td class="pass">NPC 不跟踪</td></tr>
+          <tr><td>3</td><td><span class="nt">StartTaskBTNpcTraceUnit</span></td><td>跟随AI — NPC 小于范围内结束</td><td>配置启用结束条件，玩家回到最小范围以内</td><td class="pass">NPC 不跟踪</td></tr>
+          <tr><td>4</td><td><span class="nt">StartTaskBTNpcTraceUnit</span></td><td>跟随AI — 未勾选结束条件</td><td>不勾选启用结束条件，启动节点后玩家任意走位</td><td class="pass">NPC 始终跟随，节点不提前结束</td></tr>
+          <tr><td>5</td><td><span class="nt">StartTaskBTNpcTraceUnit</span></td><td>跟随AI — 跟随上下车</td><td>勾选跟随上车，玩家上下车</td><td class="pass">NPC 跟随上下车</td></tr>
+          <tr><td>6</td><td><span class="nt">StartBTCheckPointMove（带路）</span></td><td>带路AI — 路点顺序移动</td><td>配置多段路点，启动节点（勾选是否带路）</td><td class="pass">NPC 依次抵达每个路点，顺序正确</td></tr>
+          <tr><td>7</td><td><span class="nt">StartBTCheckPointMove（带路）</span></td><td>带路AI — 玩家落后时等待</td><td>启动带路后玩家原地不动</td><td class="pass">NPC 等待</td></tr>
+          <tr><td>8</td><td><span class="nt">StartBTCheckPointMove（带路）</span></td><td>带路AI — 玩家追上后恢复移动</td><td>玩家追上 NPC 后继续跟随</td><td class="pass">NPC 继续向下一路点移动</td></tr>
+          <tr><td>9</td><td><span class="nt">StartBTCheckPointMove（带路）</span></td><td>带路AI — 路点触发动作播放</td><td>在某路点配置动作播放 Action，运行到该路点</td><td class="pass">到达路点时动作正确播放</td></tr>
+          <tr><td>10</td><td><span class="nt">StartBTCheckPointMove（带路）</span></td><td>带路AI — 路点切换步态</td><td>在某路点配置步态切换 Action</td><td class="pass">到达路点后步态正确变更</td></tr>
+          <tr><td>11</td><td><span class="nt">StartBTCheckPointMove（带路）</span></td><td>带路AI — 路点切换 AI 朝向</td><td>在某路点配置 AI 朝向 Action</td><td class="pass">到达路点后 NPC 朝向正确</td></tr>
+          <tr><td>12</td><td><span class="nt">StartBTCheckPointMove（定点）</span></td><td>定点移动AI — 无带路反馈行为</td><td>配置路点，不勾选「是否带路」，启动节点</td><td class="pass">NPC 匀速移动，无等待行为</td></tr>
+          <tr><td>13</td><td><span class="nt">StartBTCheckPointMove（定点）</span></td><td>定点移动AI — 单点寻路（navmesh）</td><td>取消勾选「是否沿路点移动」，指定单个目标点</td><td class="pass">NPC 走 navmesh 路径到达目标点</td></tr>
+          <tr><td>14</td><td><span class="nt">StartTaskBTNpcMove</span></td><td>单点移动AI — 基础移动</td><td>使用 StartTaskBTNpcMove，配置目标位置</td><td class="pass">NPC 到达指定目标位置</td></tr>
+          <tr><td>15</td><td><span class="nt">NpcChangeDirection</span></td><td>转向AI — 正确转向</td><td>使用 NpcChangeDirection 节点，指定目标朝向</td><td class="pass">NPC 完成转身，最终朝向与配置一致</td></tr>
+          <tr><td>16</td><td><span class="nt">StartTaskBTNpcAction</span></td><td>动作播放 — 任务 NPC 播放动作</td><td>使用 StartTaskBTNpcAction，配置动作序列</td><td class="pass">动作正常播放，无卡帧/穿模</td></tr>
+          <tr><td>17</td><td><span class="nt">TaskBTNpcToVehicle</span></td><td>上车 — NPC 进入载具</td><td>使用 TaskBTNpcToVehicle 节点，指定 NPC 和载具</td><td class="pass">NPC 正常进入载具</td></tr>
+          <tr><td>18</td><td><span class="nt">TaskBTNpcOutVehicleNpc</span></td><td>下车 — NPC 离开载具</td><td>使用 TaskBTNpcOutVehicleNpc 节点</td><td class="pass">NPC 正常离开载具，站立在地面</td></tr>
+          <tr><td>19</td><td><span class="nt">UnitGamePlayTrait_PushRigidBodyDoor</span></td><td>NPC 开门 — 自动推门</td><td>NPC 打上开门 Tag，移动路径延伸至门外</td><td class="pass">NPC 到达门前时自动将门推开</td></tr>
+          <tr><td>20</td><td><span class="nt">UnitGamePlayTrait_PushRigidBodyDoor</span></td><td>NPC 开门 — 开完后移除 Tag</td><td>门打开后手动取消 NPC 的开门 Tag</td><td class="pass">NPC Tag 被正确移除，无多余性能消耗</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 接口层检查项 -->
+  <div class="section">
+    <div class="sec-title">接口层检查项（Sheet1 · Spoon失败时兜底）</div>
+    <div class="full-table-wrap">
+      <table class="full-table">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th style="width:180px;">对应 Spoon 节点</th>
+            <th style="width:200px;">GM接口</th>
+            <th style="width:180px;">检查项</th>
+            <th>怎么测</th>
+            <th style="width:200px;">怎么算通过</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="api-row"><td>1</td><td><span class="nt">StartBTCheckPointMove2</span></td><td><span class="nt green">GmAgentCheckPointPathMove</span></td><td>检查路径移动 — NPC 到达终点</td><td>传入 waypointsJson（3个路点），调用后等待完成</td><td class="pass">GetNpcPosition 与最后一个路点距离相同</td></tr>
+          <tr class="api-row"><td>2</td><td><span class="nt">StartTaskBTNpcMove2</span></td><td><span class="nt green">GmAgentTaskMove</span></td><td>坐标移动 — NPC 到达目标坐标</td><td>调用 GmAgentTaskMove(agentId, x, y, z, arriveDistance=1.0, speed, moveMethod=0)，等待移动完成</td><td class="pass">GetNpcPosition 返回坐标与目标距离 ≤ arriveDistance</td></tr>
+          <tr class="api-row"><td>3</td><td><span class="nt">StartTaskBTNpcMove2<br><small>(IsWayPointMove=false, isUsePoint=false)</small></span></td><td><span class="nt green">GmAgentNavigationMove</span></td><td>导航移动 — NPC 到达目标单位附近</td><td>先 GmAetherCreateNpc 创建目标 NPC，再调用 GmAgentNavigationMove(agentId, targetUnitId, arriveDistance, speed)</td><td class="pass">GetNpcPosition(agentId) 与目标单位距离 ≤ arriveDistance</td></tr>
+          <tr class="api-row"><td>4</td><td><span class="nt">StartTaskBTNpcMove2<br><small>(IsWayPointMove=true)</small></span></td><td><span class="nt green">GmAgentWayPointMove</span></td><td>路点移动 — NPC 依次经过所有路点</td><td>传入 waypointsJson（3个路点），每到达一个路点查询 GetNpcPosition</td><td class="pass">NPC 依次在每个路点出现，最终到达末路点</td></tr>
+          <tr class="api-row"><td>5</td><td><span class="nt">StartTaskBTNpcMove2<br><small>(IsWayPointMove=true)</small></span></td><td><span class="nt green">GmAgentWayPointMove</span></td><td>路点移动 — moveMethod 影响速度</td><td>相同路径分别用 moveMethod=0(Walk) 和 1(Run) 执行，记录耗时</td><td class="pass">Run 耗时 &lt; Walk 耗时；两次均到达终点</td></tr>
+          <tr class="api-row"><td>6</td><td><span class="nt">StartTaskBTNpcTraceUnit2</span></td><td><span class="nt green">GmAgentFollow</span></td><td>跟随 — NPC 持续跟随移动目标</td><td>调用 GmAgentFollow，让 targetUnit 移动到新坐标，等待 NPC 跟上</td><td class="pass">NPC 与 target 距离保持在 comfortRange 附近</td></tr>
+          <tr class="api-row"><td>7</td><td><span class="nt">SpoonNpcGetOff</span></td><td><span class="nt green">GmAgentGetOutVehicle（已有）</span></td><td>下车 — NPC 成功下车</td><td>先让 NPC 上车，再调用 GmAgentGetOutVehicle(agentId)</td><td class="pass">GetNpcVehicleState 无载具；NPC 站立在地面</td></tr>
+          <tr class="api-row"><td>8</td><td><span class="nt">SpoonNpcGoOn</span></td><td><span class="nt green">GmAgentGetInVehicle2</span></td><td>上车（增强）— NPC 进入指定座位</td><td>先 GmSpawnAetherVehicle 创建载具，再调用 GmAgentGetInVehicle2(agentId, vehicleId, seatIndex=0)</td><td class="pass">GetNpcVehicleState 返回 vehicleId 匹配，seatIndex=0，状态为 InVehicle</td></tr>
+          <tr class="api-row"><td>9</td><td><span class="nt">SpoonNpcGoOn</span></td><td><span class="nt green">GmAgentGetInVehicle2</span></td><td>上车（增强）— 不同 seatIndex 分别入座</td><td>创建 2 个 NPC，分别用 seatIndex=0 和 1 上车</td><td class="pass">两个 NPC 的 vehicleState.seatIndex 分别为 0 和 1</td></tr>
+          <tr class="api-row"><td>10</td><td><span class="nt">SpoonNpcGoOn<br><small>(UseTaskBT=true 上车前置步骤)</small></span></td><td><span class="nt green">GmAgentMoveToVehicle</span></td><td>移动到载具登车点 — NPC 移动到位</td><td>调用 GmAgentMoveToVehicle(agentId, vehicleId, seatIndex)，等待移动完成</td><td class="pass">NPC 位置在载具指定座位登车点附近（距离 ≤ 1m）</td></tr>
+          <tr class="api-row"><td>11</td><td><span class="nt">NpcChangeDirection<br><small>(directionType=Location)</small></span></td><td><span class="nt green">GmAgentTurn</span></td><td>转向坐标 — NPC 朝向正确</td><td>调用 GmAgentTurn(agentId, targetX, targetY, targetZ)，等待 5s</td><td class="pass">NPC 朝向更新后与 target 方向夹角 &lt; 5°</td></tr>
+          <tr class="api-row"><td>12</td><td><span class="nt">NpcChangeDirection<br><small>(KeepTowards=true)</small></span></td><td><span class="nt green">GmAgentFocusOn</span></td><td>持续关注 — focusTime 内持续朝向目标</td><td>调用 GmAgentFocusOn(agentId, targetUnitId, focusTime=5, tolerance=5)</td><td class="pass">NPC 朝向更新后与 target 新位置方向夹角 &lt; 5°</td></tr>
+          <tr class="api-row"><td>13</td><td><span class="nt">NpcChangeDirection<br><small>(KeepTowards=true)</small></span></td><td><span class="nt green">GmAgentFocusOn</span></td><td>持续关注 — 目标移动时朝向跟随更新</td><td>focusTime 内让 target 移动到新坐标，再查询 NPC 朝向</td><td class="pass">NPC 朝向更新后与 target 新位置方向夹角 &lt; 5°</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Sheet2 联合视图 -->
+  <div class="section">
+    <div class="sec-title">SPOON层 + 接口层联合对照（Sheet2）</div>
+    <div class="full-table-wrap">
+      <table class="full-table">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th style="width:70px;">层级</th>
+            <th style="width:220px;">Spoon节点 / GM接口</th>
+            <th style="width:180px;">检查项</th>
+            <th>怎么测</th>
+            <th style="width:200px;">怎么算通过</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcTraceUnit</code></td><td>跟随AI — NPC 范围内跟随</td><td>配置启用结束条件，玩家站在最小~最大范围内，启动节点，Unit走到指定点</td><td class="pass">NPC 持续追随 Unit，节点不提前结束</td></tr>
+          <tr class="api-row"><td>1</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentFollow</code><br><small>(StartTaskBTNpcTraceUnit2)</small></td><td>跟随 — NPC 持续跟随移动目标</td><td>调用 GmAgentFollow，让 targetUnit 移动到新坐标，等待 NPC 跟上</td><td class="pass">NPC 与 target 距离保持在 comfortRange 附近</td></tr>
+          <tr><td>2</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcTraceUnit</code></td><td>跟随AI — NPC 超出最大范围结束</td><td>配置启用结束条件，玩家传送到最大范围以外</td><td class="pass">NPC 不跟踪</td></tr>
+          <tr><td>3</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcTraceUnit</code></td><td>跟随AI — NPC 小于范围内结束</td><td>配置启用结束条件，玩家回到最小范围以内</td><td class="pass">NPC 不跟踪</td></tr>
+          <tr><td>4</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcTraceUnit</code></td><td>跟随AI — 未勾选结束条件</td><td>不勾选启用结束条件，启动节点后玩家任意走位</td><td class="pass">NPC 始终跟随，节点不提前结束</td></tr>
+          <tr><td>5</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcTraceUnit</code></td><td>跟随AI — 跟随上下车</td><td>勾选跟随上车，玩家上下车</td><td class="pass">NPC 跟随上下车</td></tr>
+          <tr><td>6</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（带路）</code></td><td>带路AI — 路点顺序移动</td><td>配置多段路点，启动节点（勾选是否带路）</td><td class="pass">NPC 依次抵达每个路点，顺序正确</td></tr>
+          <tr class="api-row"><td>2</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentCheckPointPathMove</code><br><small>(StartBTCheckPointMove2)</small></td><td>检查路径移动 — NPC 到达终点</td><td>传入 waypointsJson（3个路点），调用后等待完成</td><td class="pass">GetNpcPosition 与最后一个路点距离相同</td></tr>
+          <tr><td>7</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（带路）</code></td><td>带路AI — 玩家落后时等待</td><td>启动带路后玩家原地不动</td><td class="pass">NPC 等待</td></tr>
+          <tr><td>8</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（带路）</code></td><td>带路AI — 玩家追上后恢复移动</td><td>玩家追上 NPC 后继续跟随</td><td class="pass">NPC 继续向下一路点移动</td></tr>
+          <tr><td>9</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（带路）</code></td><td>带路AI — 路点触发动作播放</td><td>在某路点配置动作播放 Action，运行到该路点</td><td class="pass">到达路点时动作正确播放</td></tr>
+          <tr><td>10</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（带路）</code></td><td>带路AI — 路点切换步态</td><td>在某路点配置步态切换 Action</td><td class="pass">到达路点后步态正确变更</td></tr>
+          <tr><td>11</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（带路）</code></td><td>带路AI — 路点切换 AI 朝向</td><td>在某路点配置 AI 朝向 Action</td><td class="pass">到达路点后 NPC 朝向正确</td></tr>
+          <tr><td>12</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（定点）</code></td><td>定点移动AI — 无带路反馈行为</td><td>配置路点，不勾选「是否带路」，启动节点</td><td class="pass">NPC 匀速移动，无等待行为</td></tr>
+          <tr><td>13</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartBTCheckPointMove（定点）</code></td><td>定点移动AI — 单点寻路（navmesh）</td><td>取消勾选「是否沿路点移动」，指定单个目标点</td><td class="pass">NPC 走 navmesh 路径到达目标点</td></tr>
+          <tr><td>14</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcMove</code></td><td>单点移动AI — 基础移动</td><td>使用 StartTaskBTNpcMove，配置目标位置</td><td class="pass">NPC 到达指定目标位置</td></tr>
+          <tr class="api-row"><td>3</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentTaskMove</code><br><small>(StartTaskBTNpcMove2)</small></td><td>坐标移动 — NPC 到达目标坐标</td><td>调用 GmAgentTaskMove(agentId, x, y, z, arriveDistance=1.0, speed, moveMethod=0)</td><td class="pass">GetNpcPosition 与目标距离 ≤ arriveDistance</td></tr>
+          <tr class="api-row"><td>4</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentNavigationMove</code><br><small>(StartTaskBTNpcMove2)</small></td><td>导航移动 — NPC 到达目标单位附近</td><td>先创建目标 NPC，调用 GmAgentNavigationMove(agentId, targetUnitId, arriveDistance, speed)</td><td class="pass">GetNpcPosition(agentId) 与目标单位距离 ≤ arriveDistance</td></tr>
+          <tr class="api-row"><td>5</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentWayPointMove</code><br><small>(StartTaskBTNpcMove2)</small></td><td>路点移动 — NPC 依次经过所有路点</td><td>传入 waypointsJson（3个路点），每到达一个路点查询 GetNpcPosition</td><td class="pass">NPC 依次在每个路点出现，最终到达末路点</td></tr>
+          <tr class="api-row"><td>6</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentWayPointMove</code><br><small>(StartTaskBTNpcMove2)</small></td><td>路点移动 — moveMethod 影响速度</td><td>相同路径分别用 moveMethod=0(Walk) 和 1(Run) 执行，记录耗时</td><td class="pass">Run 耗时 &lt; Walk 耗时；两次均到达终点</td></tr>
+          <tr><td>15</td><td><span class="b b-spoon">SPOON层</span></td><td><code>NpcChangeDirection</code></td><td>转向AI — 正确转向</td><td>使用 NpcChangeDirection 节点，指定目标朝向</td><td class="pass">NPC 完成转身，最终朝向与配置一致</td></tr>
+          <tr class="api-row"><td>7</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentTurn</code><br><small>(NpcChangeDirection)</small></td><td>转向坐标 — NPC 朝向正确</td><td>调用 GmAgentTurn(agentId, targetX, targetY, targetZ)，等待 5s</td><td class="pass">NPC 朝向与 target 方向夹角 &lt; 5°</td></tr>
+          <tr class="api-row"><td>8</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentFocusOn</code><br><small>(NpcChangeDirection KeepTowards=true)</small></td><td>持续关注 — focusTime 内持续朝向目标</td><td>调用 GmAgentFocusOn(agentId, targetUnitId, focusTime=5, tolerance=5)</td><td class="pass">NPC 朝向与 target 方向夹角 &lt; 5°</td></tr>
+          <tr class="api-row"><td>9</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentFocusOn</code><br><small>(NpcChangeDirection KeepTowards=true)</small></td><td>持续关注 — 目标移动时朝向跟随更新</td><td>focusTime 内让 target 移动到新坐标，再查询 NPC 朝向</td><td class="pass">NPC 朝向与 target 新位置方向夹角 &lt; 5°</td></tr>
+          <tr><td>16</td><td><span class="b b-spoon">SPOON层</span></td><td><code>StartTaskBTNpcAction</code></td><td>动作播放 — 任务 NPC 播放动作</td><td>使用 StartTaskBTNpcAction，配置动作序列</td><td class="pass">动作正常播放，无卡帧/穿模</td></tr>
+          <tr><td>17</td><td><span class="b b-spoon">SPOON层</span></td><td><code>TaskBTNpcToVehicle</code></td><td>上车 — NPC 进入载具</td><td>使用 TaskBTNpcToVehicle 节点，指定 NPC 和载具</td><td class="pass">NPC 正常进入载具</td></tr>
+          <tr class="api-row"><td>10</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentGetInVehicle2</code><br><small>(SpoonNpcGoOn)</small></td><td>上车（增强）— NPC 进入指定座位</td><td>调用 GmAgentGetInVehicle2(agentId, vehicleId, seatIndex=0)</td><td class="pass">vehicleId 匹配，seatIndex=0，状态为 InVehicle</td></tr>
+          <tr class="api-row"><td>11</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentGetInVehicle2</code><br><small>(SpoonNpcGoOn)</small></td><td>上车（增强）— 不同 seatIndex 分别入座</td><td>创建 2 个 NPC，分别用 seatIndex=0 和 1 上车</td><td class="pass">两个 NPC 的 vehicleState.seatIndex 分别为 0 和 1</td></tr>
+          <tr class="api-row"><td>12</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentMoveToVehicle</code><br><small>(SpoonNpcGoOn UseTaskBT=true)</small></td><td>移动到载具登车点 — NPC 移动到位</td><td>调用 GmAgentMoveToVehicle(agentId, vehicleId, seatIndex)，等待移动完成</td><td class="pass">NPC 位置在载具指定座位登车点附近（≤ 1m）</td></tr>
+          <tr><td>18</td><td><span class="b b-spoon">SPOON层</span></td><td><code>TaskBTNpcOutVehicleNpc</code></td><td>下车 — NPC 离开载具</td><td>使用 TaskBTNpcOutVehicleNpc 节点</td><td class="pass">NPC 正常离开载具，站立在地面</td></tr>
+          <tr class="api-row"><td>13</td><td><span class="b b-api">接口层</span></td><td><code>GmAgentGetOutVehicle（已有）</code><br><small>(SpoonNpcGetOff)</small></td><td>下车 — NPC 成功下车</td><td>先让 NPC 上车，再调用 GmAgentGetOutVehicle(agentId)</td><td class="pass">GetNpcVehicleState 无载具；NPC 站立在地面</td></tr>
+          <tr><td>19</td><td><span class="b b-spoon">SPOON层</span></td><td><code>UnitGamePlayTrait_PushRigidBodyDoor</code></td><td>NPC 开门 — 自动推门</td><td>NPC 打上开门 Tag，移动路径延伸至门外</td><td class="pass">NPC 到达门前时自动将门推开</td></tr>
+          <tr><td>20</td><td><span class="b b-spoon">SPOON层</span></td><td><code>UnitGamePlayTrait_PushRigidBodyDoor</code></td><td>NPC 开门 — 开完后移除 Tag</td><td>门打开后手动取消 NPC 的开门 Tag</td><td class="pass">NPC Tag 被正确移除，无多余性能消耗</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
