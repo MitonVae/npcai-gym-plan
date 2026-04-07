@@ -134,9 +134,9 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
 </div>
 
 <div class="main">
-  <div class="stats">
-    <div class="stat"><div class="n">4</div><div class="l">Spoon节点</div></div>
-    <div class="stat"><div class="n">18</div><div class="l">独立Task</div></div>
+    <div class="stats">
+    <div class="stat"><div class="n">6</div><div class="l">Spoon节点</div></div>
+    <div class="stat"><div class="n">20+</div><div class="l">独立Task</div></div>
     <div class="stat"><div class="n">2</div><div class="l">验证层级</div></div>
     <div class="stat"><div class="n">3</div><div class="l">迭代阶段</div></div>
     <div class="stat"><div class="n">P0</div><div class="l">优先级</div></div>
@@ -466,7 +466,7 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
         <div class="phase-head p1">
           <div class="pn">Phase 1 · Q2 2026</div>
           <h3>全节点接入</h3>
-          <div class="pt">4个核心节点全部基础接入</div>
+          <div class="pt">6个核心节点全部基础接入</div>
         </div>
         <div class="phase-body">
           <ul>
@@ -474,6 +474,8 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
             <li>StartBTCheckPointMove2 基础 Task 接入</li>
             <li>StartTaskBTNpcMove2 基础 Task 接入</li>
             <li>NpcChangeDirection 基础 Task 接入</li>
+            <li>SpoonNpcGoOn 基础 Task 接入</li>
+            <li>SpoonNpcGetOff 基础 Task 接入</li>
             <li>两层验证框架搭建（Spoon + Interface）</li>
             <li>集成进 CI 日报</li>
           </ul>
@@ -483,8 +485,8 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
       <div class="phase">
         <div class="phase-head p2">
           <div class="pn">Phase 2 · Q3 2026</div>
-          <h3>参数完善</h3>
-          <div class="pt">每个节点各关键参数独立 Task 覆盖</div>
+          <h3>参数完善 & 关联节点</h3>
+          <div class="pt">各节点关键参数覆盖 + 二期关联节点</div>
         </div>
         <div class="phase-body">
           <ul>
@@ -494,7 +496,10 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
             <li>Interface 层复核路径完善</li>
             <li>失败率统计与分类归因</li>
           </ul>
-          <div class="note">目标：参数覆盖率 &gt; 80%，能精准定位 Bug 层级</div>
+          <div class="note" style="margin-top:10px;">
+            <strong style="color:#555;">二期关联节点（非本侧重点，简单覆盖）</strong><br>
+            POI 节点（可能影响路点和引路逻辑）、NPC Tag 相关节点（影响 NPC 状态筛选）等，纳入回归验证范围，不作参数级精细拆分。
+          </div>
         </div>
       </div>
       <div class="phase">
