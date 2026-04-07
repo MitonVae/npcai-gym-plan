@@ -391,6 +391,89 @@ body{font-family:'Microsoft YaHei',sans-serif;background:#f0f4f8;color:#1a1a2e;f
       </table>
     </div>
 
+
+    <!-- Node 5: GoOn -->
+    <div class="node-card">
+      <div class="node-head">
+        <div>
+          <h3>SpoonNpcGoOn — 上载具</h3>
+          <div class="sub">NPC 乘上指定载具，触发上车动作与状态切换</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <span class="node-badge">2 Tasks</span>
+          <span class="tag t-p1">P1</span>
+        </div>
+      </div>
+      <table class="ttable">
+        <thead>
+          <tr>
+            <th class="idx">#</th>
+            <th>Task 名称</th>
+            <th>Spoon节点配置</th>
+            <th>代码参数</th>
+            <th>通过条件</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="idx">1</td>
+            <td>GoOn_正常上车</td>
+            <td>填写「目标载具ID」</td>
+            <td><span class="mono">vehicleId</span></td>
+            <td class="pass-cond">NPC成功上车，状态切换为乘坐中</td>
+          </tr>
+          <tr>
+            <td class="idx">2</td>
+            <td>GoOn_上车后触发回调</td>
+            <td>填写「载具ID」，勾选「上车完成回调」</td>
+            <td><span class="mono">onMountCallback=true</span></td>
+            <td class="pass-cond">上车动作完成后触发后续 Spoon 节点</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Node 6: GetOff -->
+    <div class="node-card">
+      <div class="node-head">
+        <div>
+          <h3>SpoonNpcGetOff — 下载具</h3>
+          <div class="sub">NPC 从载具下车，恢复正常移动状态</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <span class="node-badge">2 Tasks</span>
+          <span class="tag t-p1">P1</span>
+        </div>
+      </div>
+      <table class="ttable">
+        <thead>
+          <tr>
+            <th class="idx">#</th>
+            <th>Task 名称</th>
+            <th>Spoon节点配置</th>
+            <th>代码参数</th>
+            <th>通过条件</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="idx">1</td>
+            <td>GetOff_正常下车</td>
+            <td>（无需额外配置，直接执行节点）</td>
+            <td><span class="mono">—</span></td>
+            <td class="pass-cond">NPC成功下车，状态切换为自由移动</td>
+          </tr>
+          <tr>
+            <td class="idx">2</td>
+            <td>GetOff_下车后恢复跟随</td>
+            <td>下游接「跟随」节点</td>
+            <td><span class="mono">—</span></td>
+            <td class="pass-cond">下车完成后 NPC 无缝切换回跟随状态</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div><!-- /tab-tasks -->
 
   <!-- ═════ TAB 2: Flow ═════ -->
